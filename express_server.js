@@ -12,9 +12,9 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com",
 };
 
-app.post("/urls", (req, res) => { 
-  let shortRanURL = generateRandomString()
-  urlDatabase[shortRanURL] = req.body.longURL
+app.post("/urls", (req, res) => {
+  let shortRanURL = generateRandomString();
+  urlDatabase[shortRanURL] = req.body.longURL;
   res.redirect(`/urls/${shortRanURL}`);
 });
 
@@ -45,25 +45,24 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL]
-  if(!longURL){
-    return res.send("Error: The page doesn't exist")
+  const longURL = urlDatabase[req.params.shortURL];
+  if (!longURL) {
+    return res.send("Error: The page doesn't exist");
   }
-  res.redirect(longURL)
+  res.redirect(longURL);
 });
 
-function generateRandomString() {
+const generateRandomString = () => {
   
-    let random = [];
-    const possible = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let random = [];
+  const possible = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     
-    for (let i = 0; i < 6; i++ ) {
-      random.push(possible.charAt(Math.floor(Math.random() * possible.length)))
-    }
+  for (let i = 0; i < 6; i++) {
+    random.push(possible.charAt(Math.floor(Math.random() * possible.length)));
+  }
    
   return random.join("");
-}
-
+};
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
