@@ -14,6 +14,32 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com",
 };
 
+const users = { 
+  "userRandomID": {
+    id: "userRandomID", 
+    email: "user@example.com", 
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  }
+}
+
+app.post("/register", (req, res) => {
+  
+  const userId = generateRandomString()
+ 
+  users[userId] = {
+    id: userId,
+    email: req.body.email,
+    password: req.body.password
+  }
+  res.cookie("user_id", userId)
+  res.redirect("/urls")
+})
+
 app.post("/login", (req, res) => {
   let username = req.body.username
   res.cookie("username", username)
@@ -68,18 +94,6 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-// app.get("/", (req, res) => {
-//   res.send("Hello!");
-// });
-
-// app.get("/urls.json", (req, res) => {
-//   res.json(urlDatabase);
-// });
-
-// app.get("/hello", (req, res) => {
-//   res.send("<html><body>Hello <b>World</b></body></html>\n");
-// });
-
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
   if (!longURL) {
@@ -100,6 +114,21 @@ const generateRandomString = () => {
   return random.join("");
 };
 
+
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+
+app.get("/urls.json", (req, res) => {
+  res.json(users);
+});
+
+// app.get("/", (req, res) => {
+//   res.send("Hello!");
+// });
+
+
+
+// app.get("/hello", (req, res) => {
+//   res.send("<html><body>Hello <b>World</b></body></html>\n");
+// });
