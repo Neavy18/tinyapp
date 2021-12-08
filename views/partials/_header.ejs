@@ -10,7 +10,7 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
     </div>
-    <% if (!user.email){ %>
+    <% if (!user){ %>
       <form method='POST' action="/login">
         <input name="username" type="text" placeholder="Username" style= "width: 185px; height: 40px; margin-right: 10px; border-radius: 5px;">
         <button type="submit" class="btn btn-outline-dark">Login</button>

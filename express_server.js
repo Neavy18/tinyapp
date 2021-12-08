@@ -28,6 +28,15 @@ const users = {
 }
 
 app.post("/register", (req, res) => {
+
+  if(!req.body.email || !req.body.password){
+    return res.send(400)
+  }
+  for (let user in users){
+    if (users[user].email === req.body.email){
+      return res.send(400)
+    }
+  }
   
   const userId = generateRandomString()
  
@@ -36,6 +45,7 @@ app.post("/register", (req, res) => {
     email: req.body.email,
     password: req.body.password
   }
+  
   res.cookie("user_id", userId)
   res.redirect("/urls")
 })
@@ -118,7 +128,11 @@ const generateRandomString = () => {
   return random.join("");
 };
 
-
+// const checkEmptyMail = (user) => {
+//   if (!user.email ){
+//     return 400
+//   }
+// }
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
