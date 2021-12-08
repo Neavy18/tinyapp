@@ -16,7 +16,10 @@
         <button type="submit" class="btn btn-outline-dark">Login</button>
       </form> 
     <%} else{%>
-       <span><%= username %></span>
+       <span style= "margin-right: 20px; font-size: large; font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif">  <strong> Logged in as: <%= username %> !</strong></span>
+       <form method='POST' action="/logout">
+        <button type="submit" class="btn btn-outline-dark">Logout</button>
+      </form> 
     <%}%>
     
   </nav>
