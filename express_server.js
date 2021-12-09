@@ -37,7 +37,7 @@ app.post("/register", (req, res) => {
       return res.send(400)
     }
   }
-  
+ 
   const userId = generateRandomString()
  
   users[userId] = {
@@ -51,8 +51,19 @@ app.post("/register", (req, res) => {
 })
 
 app.post("/login", (req, res) => {
-  let username = req.body.username
-  res.cookie("username", username)
+  
+existUser = loginHelper(req.body.email,req.body.password, users)
+
+if(existUser.error){
+  return res.send(existUser.error)
+}
+
+res.cookie("user_id", existUser.id)
+res.redirect("/urls")
+})
+
+app.post("/logout", (req, res) => {
+  res.clearCookie("user_id")
   res.redirect("/urls")
 })
 
@@ -75,7 +86,6 @@ app.post("/urls", (req, res) => {
 app.get("/login", (req, res) => {
   const templateVars = {
     urls: urlDatabase,
-    // username: req.cookies["username"]
     user : users[req.cookies["user_id"]]
   };
   res.render("urls_login",templateVars)
@@ -84,7 +94,6 @@ app.get("/login", (req, res) => {
 app.get("/register", (req,res) => {
   const templateVars = {
     urls: urlDatabase,
-    // username: req.cookies["username"]
     user : users[req.cookies["user_id"]]
   };
   res.render("urls_registration", templateVars)
@@ -94,7 +103,6 @@ app.get("/urls", (req, res) => {
   const templateVars = {
     urls: urlDatabase,
     user : users[req.cookies["user_id"]]
-    // username: req.cookies["username"]
   };
   res.render("urls_index", templateVars);
 });
@@ -102,7 +110,6 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   const templateVars = {
     user : users[req.cookies["user_id"]]
-    // username: req.cookies["username"]
   }
   res.render("urls_new", templateVars);
 });
@@ -111,7 +118,6 @@ app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
     shortURL: req.params.shortURL, 
     longURL: urlDatabase[req.params.shortURL],
-    // username: req.cookies["username"]
     user : users[req.cookies["user_id"]]
   };
   res.render("urls_show", templateVars);
@@ -137,11 +143,22 @@ const generateRandomString = () => {
   return random.join("");
 };
 
-// const checkEmptyMail = (user) => {
-//   if (!user.email ){
-//     return 400
-//   }
-// }
+
+const loginHelper = (email, password, data) => {
+
+  if(!email || !password){
+    return {error: 403}
+  }
+
+  for(let user in data){
+    if(data[user].email === email && data[user].password === password) {
+    return data[user]
+    } 
+  }
+
+  return {error: 403}
+}
+
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
@@ -149,6 +166,7 @@ app.listen(PORT, () => {
 app.get("/urls.json", (req, res) => {
   res.json(users);
 });
+
 
 // app.get("/", (req, res) => {
 //   res.send("Hello!");
