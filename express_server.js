@@ -7,23 +7,9 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 app.set("view engine", "ejs");
 
-const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com",
-};
+const urlDatabase = {};
 
-const users = { 
-  "userRandomID": {
-    id: "userRandomID", 
-    email: "user@example.com", 
-    password: "purple-monkey-dinosaur"
-  },
- "user2RandomID": {
-    id: "user2RandomID", 
-    email: "user2@example.com", 
-    password: "dishwasher-funk"
-  }
-}
+const users = {};
 
 //register
 app.post("/register", (req, res) => {
@@ -71,19 +57,29 @@ app.post("/logout", (req, res) => {
 //match short URL and long URL
 app.post("/urls", (req, res) => {
   let shortRanURL = generateRandomString();
-  urlDatabase[shortRanURL] = req.body.longURL;
+  urlDatabase[shortRanURL] = {longURL: req.body.longURL, userID: req.cookies["user_id"]};
   res.redirect("/urls");
 });
 
 //delete URL 
 app.post("/urls/:shortURL/delete", (req, res) => {
+  
+  let currentUser = users[req.cookies["user_id"]];
+  if(!currentUser){
+    res.redirect("/login")
+  }
+
   delete urlDatabase[req.params.shortURL]
   res.redirect("/urls")
 });
 
 //edit URL 
 app.post("/urls/:shortURL", (req, res) => {
-  urlDatabase[req.params.shortURL] = req.body.newURL
+  let currentUser = users[req.cookies["user_id"]];
+  if(!currentUser){
+    res.redirect("/login")
+  }
+  urlDatabase[req.params.shortURL] = {longURL: req.body.newURL, userID: req.cookies["user_id"]}
   res.redirect("/urls")
 });
 
@@ -116,9 +112,16 @@ app.get("/login", (req, res) => {
 
 //loads TinyURL page
 app.get("/urls/new", (req, res) => {
+  
   const templateVars = {
     user : users[req.cookies["user_id"]]
   }
+  let currentUser = users[req.cookies["user_id"]];
+
+  if(!currentUser){
+    res.redirect("/login")
+  }
+
   res.render("urls_new", templateVars);
 });
 
@@ -126,22 +129,29 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
     shortURL: req.params.shortURL, 
-    longURL: urlDatabase[req.params.shortURL],
+    longURL: urlDatabase[req.params.shortURL].longURL,
     user : users[req.cookies["user_id"]]
   };
+  let currentUser = users[req.cookies["user_id"]];
+  if(!currentUser){
+    res.redirect("/login")
+  }
   res.render("urls_show", templateVars);
 });
 
 //if short URL is assigned to valid longURl, redirects to page
 //if not, returns error message
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
+  const longURL = urlDatabase[req.params.shortURL].longURL;
   if (!longURL) {
     return res.send("Error: The page doesn't exist");
   }
   res.redirect(longURL);
 });
 
+app.get("/urls.json", (req, res) => {
+  res.json(urlDatabase);
+});
 //generates random string for short URL
 const generateRandomString = () => {
   
@@ -179,9 +189,7 @@ app.listen(PORT, () => {
 //   res.send("Hello!");
 // });
 
-// app.get("/urls.json", (req, res) => {
-//   res.json(urlDatabase);
-// });
+
 
 // app.get("/hello", (req, res) => {
 //   res.send("<html><body>Hello <b>World</b></body></html>\n");
