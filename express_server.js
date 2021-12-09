@@ -12,6 +12,43 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com",
 };
 
+const users = { 
+  "userRandomID": {
+    id: "userRandomID", 
+    email: "user@example.com", 
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  }
+}
+
+//register
+app.post("/register", (req, res) => {
+
+  if(!req.body.email || !req.body.password){
+    return res.send(400)
+  }
+  for (let user in users){
+    if (users[user].email === req.body.email){
+      return res.send(400)
+    }
+  }
+ 
+  const userId = generateRandomString()
+ 
+  users[userId] = {
+    id: userId,
+    email: req.body.email,
+    password: req.body.password
+  }
+  
+  res.cookie("user_id", userId)
+  res.redirect("/urls")
+})
+
 //login 
 app.post("/login", (req, res) => {
   
@@ -59,7 +96,25 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-//create TinyURL page
+//loads register
+app.get("/register", (req,res) => {
+  const templateVars = {
+    urls: urlDatabase,
+    user : users[req.cookies["user_id"]]
+  };
+  res.render("urls_registration", templateVars)
+})
+
+//loads login
+app.get("/login", (req, res) => {
+  const templateVars = {
+    urls: urlDatabase,
+    user : users[req.cookies["user_id"]]
+  };
+  res.render("urls_login",templateVars)
+}); 
+
+//loads TinyURL page
 app.get("/urls/new", (req, res) => {
   const templateVars = {
     user : users[req.cookies["user_id"]]
@@ -67,7 +122,7 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
-// reassign shortURl to new longURL
+//loads shortURl to new longURL page
 app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
     shortURL: req.params.shortURL, 
@@ -100,7 +155,7 @@ const generateRandomString = () => {
   return random.join("");
 };
 
- // checks for existing email and password
+// checks for existing email and password
 const loginHelper = (email, password, data) => {
 
   if(!email || !password){
