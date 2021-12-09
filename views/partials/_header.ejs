@@ -10,14 +10,16 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
     </div>
-    <% if (!username){ %>
-      <form method='POST' action="/login">
-        <input name="username" type="text" placeholder="Username" style= "width: 185px; height: 40px; margin-right: 10px; border-radius: 5px;">
+    <% if (!user){ %>
+      <form method='GET' action="/register">
+        <button type="submit" class="btn btn-outline-dark" style="margin-right: 20px;">Register</button>
+      </form> 
+      <form method='GET' action="/login">
         <button type="submit" class="btn btn-outline-dark">Login</button>
       </form> 
-    <%} else{%>
-       <span style= "margin-right: 20px; font-size: large; font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif">  <strong> Logged in as: <%= username %> !</strong></span>
-       <form method='POST' action="/logout">
+    <%} else {%>
+      <form method='POST' action="/logout">
+        <span style= "margin-right: 20px; font-size: large; font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif">  <strong> Logged in as: <%= user.email %> !</strong></span>
         <button type="submit" class="btn btn-outline-dark">Logout</button>
       </form> 
     <%}%>
