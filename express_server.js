@@ -83,12 +83,35 @@ app.post("/urls/:shortURL", (req, res) => {
   res.redirect("/urls")
 });
 
-//my URLS page
-app.get("/urls", (req, res) => {
+app.get("/", (req, res) => {
+  
+  let currentUser = users[req.cookies["user_id"]];
+
   const templateVars = {
     urls: urlDatabase,
-    user : users[req.cookies["user_id"]]
+    user : currentUser
   };
+
+  if(!currentUser){
+    res.render("urls_login", templateVars)
+  } else{res.render("urls_index", templateVars)}
+
+});
+
+//my URLS page
+app.get("/urls", (req, res) => {
+
+  let currentUser = users[req.cookies["user_id"]];
+
+  const templateVars = {
+    urls:  urlsForUser(req.cookies["user_id"], urlDatabase),
+    user : currentUser
+  };
+
+  if(!currentUser){
+    res.render("urls_login", templateVars)
+  }
+
   res.render("urls_index", templateVars);
 });
 
@@ -133,8 +156,13 @@ app.get("/urls/:shortURL", (req, res) => {
     user : users[req.cookies["user_id"]]
   };
   let currentUser = users[req.cookies["user_id"]];
+  let byeFunction = checkShort(req.cookies["user_id"], urlDatabase)
+  
+  if(byeFunction.error){
+    res.send(byeFunction.error)
+  }
   if(!currentUser){
-    res.redirect("/login")
+    res.send("Error: you are either not logged in or this shortURL belongs to another user")
   }
   res.render("urls_show", templateVars);
 });
@@ -152,6 +180,7 @@ app.get("/u/:shortURL", (req, res) => {
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
+
 //generates random string for short URL
 const generateRandomString = () => {
   
@@ -181,13 +210,32 @@ const loginHelper = (email, password, data) => {
   return {error: 403}
 }
 
+//checks for User's urls and returns an object
+const urlsForUser = (id, data) => {
+  const shortobj = {};
+
+  for(let shortURL in data){
+    if(data[shortURL].userID === id){
+      shortobj[shortURL] = data[shortURL]
+    }
+  }
+  return shortobj
+}
+
+//checks that the urls:id belong to the account
+const checkShort  = (id, data) => {
+
+  for(let shortURL in data){
+    if(data[shortURL].userID !== id) {
+      return {error: "This URL doesn't seem connected to your account"}
+    }
+  }
+  return {error: null}
+}
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
-// app.get("/", (req, res) => {
-//   res.send("Hello!");
-// });
 
 
 
