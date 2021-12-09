@@ -3,13 +3,14 @@ const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcryptjs');
 const {
   generateRandomString,
   uniqueRegister,
   loginHelper,
   urlsForUser,
   checkShort
-} = require('./functions_server')
+} = require('./functions_server');
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
@@ -31,12 +32,14 @@ app.post("/register", (req, res) => {
     return res.send(newUser.error);
   }
 
+  const hashedPassword = bcrypt.hashSync(req.body.password, 10);
+
   const userId = generateRandomString();
  
   users[userId] = {
     id: userId,
     email: req.body.email,
-    password: req.body.password
+    hashedPassword: hashedPassword
   };
 
   res.cookie("user_id", userId);
@@ -46,8 +49,8 @@ app.post("/register", (req, res) => {
 //login
 app.post("/login", (req, res) => {
   
-  const existUser = loginHelper(req.body.email,req.body.password, users);
-
+  const existUser = loginHelper(req.body.email, req.body.password, users);
+  
   if (existUser.error) {
     return res.send(existUser.error);
   }
@@ -77,6 +80,12 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   
   let currentUser = users[req.cookies["user_id"]];
 
+  let identityCheck = checkShort(req.cookies["user_id"], urlDatabase);
+  
+  if (identityCheck.error) {
+    res.send(identityCheck.error);
+  }
+
   if (!currentUser) {
     res.redirect("/login");
   }
@@ -90,7 +99,13 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 app.post("/urls/:shortURL", (req, res) => {
   
   let currentUser = users[req.cookies["user_id"]];
-
+  
+  let identityCheck = checkShort(req.cookies["user_id"], urlDatabase);
+  
+  if (identityCheck.error) {
+    res.send(identityCheck.error);
+  }
+  
   if (!currentUser) {
     res.redirect("/login");
   }
@@ -188,10 +203,10 @@ app.get("/urls/:shortURL", (req, res) => {
   
   let currentUser = users[req.cookies["user_id"]];
   
-  let byeFunction = checkShort(req.cookies["user_id"], urlDatabase);
+  let identityCheck = checkShort(req.cookies["user_id"], urlDatabase);
   
-  if (byeFunction.error) {
-    res.send(byeFunction.error);
+  if (identityCheck.error) {
+    res.send(identityCheck.error);
   }
 
   if (!currentUser) {

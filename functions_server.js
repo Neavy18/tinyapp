@@ -1,4 +1,5 @@
 // *** All functions being used by the express server *** //
+const bcrypt = require('bcryptjs');
 
 //generates random string for short URL
 const generateRandomString = () => {
@@ -28,13 +29,13 @@ const uniqueRegister = (email, password, data) => {
 
 // checks for existing email and password
 const loginHelper = (email, password, data) => {
-
+  
   if (!email || !password) {
     return {error: 403};
   }
 
   for (let user in data) {
-    if (data[user].email === email && data[user].password === password) {
+    if (data[user].email === email && bcrypt.compareSync(password, data[user].hashedPassword)) {
       return data[user];
     }
   }
@@ -56,13 +57,15 @@ const urlsForUser = (id, data) => {
 
 //checks that the urls:id belongs to the account
 const checkShort  = (id, data) => {
+  
   let error = {};
+  
   for (let shortURL in data) {
     if (data[shortURL].userID === id) {
-      error = {error: null}
+      error = {error: null};
     } else error = { error:"This URL doesn't belong to your account"};
   }
-  return error
+  return error;
 };
 
 module.exports = {
