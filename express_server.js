@@ -99,22 +99,22 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 app.post("/urls/:shortURL", (req, res) => {
   
   let currentUser = users[req.cookies["user_id"]];
+
+  if (!currentUser) {
+    res.redirect("/login");
+  }
   
   let identityCheck = checkShort(req.cookies["user_id"], urlDatabase);
   
   if (identityCheck.error) {
     res.send(identityCheck.error);
   }
-  
-  if (!currentUser) {
-    res.redirect("/login");
-  }
+
 
   urlDatabase[req.params.shortURL] = {longURL: req.body.newURL, userID: req.cookies["user_id"]};
   
   res.redirect("/urls");
 });
-
 
 
 //  ****** GET ****** //
