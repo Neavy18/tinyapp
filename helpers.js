@@ -10,15 +10,16 @@ const generateRandomString = () => {
   for (let i = 0; i < 6; i++) {
     random.push(possible.charAt(Math.floor(Math.random() * possible.length)));
   }
-
   return random.join("");
 };
 
-// insures that a register email doesn't already exist
+// insures that a register email doesn't already exist and that password and email fields are filled in
 const uniqueRegister = (email, password, data) => {
+  
   if (!email || !password) {
     return {error: "<html><body><h2>Email and password are necessary to register</html></body></h2>"};
   }
+
   for (let user in data) {
     if (data[user].email === email) {
       return {error: "<html><body><h2>This email already exists!</html></body></h2>"};
@@ -27,7 +28,7 @@ const uniqueRegister = (email, password, data) => {
   return {error: null};
 };
 
-// checks for existing email and password
+// checks for existing email and password and that password and email fields are filled in
 const loginHelper = (email, password, data) => {
   
   if (!email || !password) {

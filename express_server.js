@@ -2,7 +2,6 @@ const PORT = 8080; // default port 8080
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
-const cookieParser = require('cookie-parser');
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
 const {
@@ -14,7 +13,6 @@ const {
 } = require('./helpers');
 
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(cookieParser());
 app.use(cookieSession({
   name: 'session',
   keys: ['key1', 'key2'],
@@ -39,7 +37,6 @@ app.post("/register", (req, res) => {
   }
 
   const hashedPassword = bcrypt.hashSync(req.body.password, 10);
-
   const userId = generateRandomString();
  
   users[userId] = {
@@ -165,7 +162,7 @@ app.get("/login", (req, res) => {
   res.render("urls_login",templateVars);
 });
 
-//my URLS page
+//loads URLS page
 app.get("/urls", (req, res) => {
 
   let currentUser = users[req.session.user_id];
@@ -232,11 +229,6 @@ app.get("/u/:shortURL", (req, res) => {
   }
   
   res.redirect(longURL);
-});
-
-//access to .json page to monitor users / urlDatabase
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
 });
 
 
