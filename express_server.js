@@ -93,7 +93,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   }
 
   if (!currentUser) {
-    return res.send("You are not currently logged in!");
+    return res.send("<html><body><h1>Error: You are not currently logged in!</h1></body></html>");
   }
 
   delete urlDatabase[req.params.shortURL];
@@ -113,7 +113,7 @@ app.post("/urls/:shortURL", (req, res) => {
   const identityCheck = checkShort(currentUser.id, urlDatabase);
 
   if (!identityCheck.includes(req.params.shortURL)) {
-    return res.send("This URL doesnt seem connected to your account!");
+    return res.send("<html><body><h3>Error: This URL does not seem connected to your account!</h3></body></html>");
   }
   
   urlDatabase[req.params.shortURL] = {longURL: req.body.newURL, userID: req.session.user_id};
@@ -171,7 +171,7 @@ app.get("/urls", (req, res) => {
   let currentUser = users[req.session.user_id];
 
   if (!currentUser) {
-    return res.send("You are not currently logged in!");
+    return res.send("<html><body><h3>Error: You are not currently logged in!</h3></body></html>");
   }
 
   const templateVars = {
@@ -203,7 +203,13 @@ app.get("/urls/:shortURL", (req, res) => {
   const currentUser = users[req.session.user_id];
 
   if (!currentUser) {
-    return res.send("You are not currently logged in!");
+    return res.send("<html><body><h1>Error: You are not currently logged in!</h1></body></html>");
+  }
+  
+  const identityCheck = checkShort(currentUser.id, urlDatabase);
+
+  if (!identityCheck.includes(req.params.shortURL)) {
+    return res.send("<html><body><h3>Error: This URL does not seem connected to your account!</h3></body></html>");
   }
 
   const templateVars = {
@@ -212,12 +218,6 @@ app.get("/urls/:shortURL", (req, res) => {
     user : users[req.session.user_id]
   };
   
-  const identityCheck = checkShort(currentUser.id, urlDatabase);
-
-  if (!identityCheck.includes(req.params.shortURL)) {
-    return res.send("This URL does not seem connected to your account!");
-  }
- 
   res.render("urls_show", templateVars);
 });
 
