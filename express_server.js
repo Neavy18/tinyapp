@@ -61,7 +61,6 @@ app.post("/login", (req, res) => {
     return res.send(existUser.error);
   }
 
-  //res.cookie("user_id", existUser.id);
   req.session.user_id = existUser.id;
   res.redirect("/urls");
 });
@@ -94,7 +93,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   }
 
   if (!currentUser) {
-    res.redirect("/login");
+    return res.send("You are not currently logged in!");
   }
 
   delete urlDatabase[req.params.shortURL];
@@ -172,7 +171,7 @@ app.get("/urls", (req, res) => {
   let currentUser = users[req.session.user_id];
 
   if (!currentUser) {
-    return res.redirect("/register");
+    return res.send("You are not currently logged in!");
   }
 
   const templateVars = {
@@ -201,22 +200,22 @@ app.get("/urls/new", (req, res) => {
 //loads shortURl to new longURL page
 app.get("/urls/:shortURL", (req, res) => {
   
+  const currentUser = users[req.session.user_id];
+
+  if (!currentUser) {
+    return res.send("You are not currently logged in!");
+  }
+
   const templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL].longURL,
     user : users[req.session.user_id]
   };
   
-  const currentUser = users[req.session.user_id];
-
-  if (!currentUser) {
-    return res.redirect("/login");
-  }
-
   const identityCheck = checkShort(currentUser.id, urlDatabase);
 
   if (!identityCheck.includes(req.params.shortURL)) {
-    return res.send("This URL doesnt seem connected to your account!");
+    return res.send("This URL does not seem connected to your account!");
   }
  
   res.render("urls_show", templateVars);
@@ -228,8 +227,8 @@ app.get("/u/:shortURL", (req, res) => {
   
   const longURL = urlDatabase[req.params.shortURL].longURL;
   
-  if (!longURL) {
-    return res.send("Error: The page doesn't exist");
+  if (!longURL[req.params.shortURL]) {
+    return res.send("<html><body><h1>Error: The page doesn't exist</h1></body></html>");
   }
   
   res.redirect(longURL);

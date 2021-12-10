@@ -17,7 +17,7 @@ const generateRandomString = () => {
 // insures that a register email doesn't already exist
 const uniqueRegister = (email, password, data) => {
   if (!email || !password) {
-    return {error: 400};
+    return {error: "Email and password are necessary to register"};
   }
   for (let user in data) {
     if (data[user].email === email) {
@@ -31,7 +31,7 @@ const uniqueRegister = (email, password, data) => {
 const loginHelper = (email, password, data) => {
   
   if (!email || !password) {
-    return {error: 403};
+    return {error: "Email and password are necessary to login"};
   }
 
   for (let user in data) {
@@ -39,7 +39,7 @@ const loginHelper = (email, password, data) => {
       return data[user];
     }
   }
-  return {error: 403};
+  return {error: "Email or password does not match"};
 };
 
 //checks for User's urls and returns an object
