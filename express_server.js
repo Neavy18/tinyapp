@@ -105,19 +105,18 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 //edit URL
 app.post("/urls/:shortURL", (req, res) => {
   
-  let currentUser = users[req.session.user_id];
+  const currentUser = users[req.session.user_id];
 
   if (!currentUser) {
-    res.redirect("/login");
-  }
-  
-  let identityCheck = checkShort(req.session.user_id, urlDatabase);
-  
-  if (identityCheck.error) {
-    res.send(identityCheck.error);
+    return res.redirect("/login");
   }
 
+  const identityCheck = checkShort(currentUser.id, urlDatabase);
 
+  if (!identityCheck.includes(req.params.shortURL)) {
+    return res.send("This URL doesnt seem connected to your account!");
+  }
+  
   urlDatabase[req.params.shortURL] = {longURL: req.body.newURL, userID: req.session.user_id};
   
   res.redirect("/urls");
@@ -194,7 +193,7 @@ app.get("/urls/new", (req, res) => {
   let currentUser = users[req.session.user_id];
 
   if (!currentUser) {
-    res.redirect("/login");
+    return res.redirect("/login");
   }
   res.render("urls_new", templateVars);
 });
@@ -208,18 +207,18 @@ app.get("/urls/:shortURL", (req, res) => {
     user : users[req.session.user_id]
   };
   
-  let currentUser = users[req.session.user_id];
-  
-  let identityCheck = checkShort(req.session.user_id, urlDatabase);
-  
-  if (identityCheck.error) {
-    res.send(identityCheck.error);
-  }
+  const currentUser = users[req.session.user_id];
 
   if (!currentUser) {
-    res.send("Error: you are either not logged in or this shortURL belongs to another user");
+    return res.redirect("/login");
   }
 
+  const identityCheck = checkShort(currentUser.id, urlDatabase);
+
+  if (!identityCheck.includes(req.params.shortURL)) {
+    return res.send("This URL doesnt seem connected to your account!");
+  }
+ 
   res.render("urls_show", templateVars);
 });
 

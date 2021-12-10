@@ -58,24 +58,26 @@ const urlsForUser = (id, data) => {
 //checks that the urls:id belongs to the account
 const checkShort  = (id, data) => {
   
-  let error = {};
+  let array = [];
 
   for (let shortURL in data) {
-    if (data[shortURL].userID === id) {
-      error = {error: null};
-    } else error = { error:"This URL doesn't belong to your account"};
+    if (id === data[shortURL].userID) {
+      array.push(shortURL);
+    }
   }
-  return error;
+  return array;
 };
 
+//finds a user by email
 const getUserByEmail = function(email, database) {
-  for(let user in database){
-    if(database[user].email === email){ 
-      return database[user].id
+  
+  for (let user in database) {
+    if (database[user].email === email) {
+      return database[user].id;
     }
-  } 
-  return undefined
-}
+  }
+  return undefined;
+};
 
 module.exports = {
   generateRandomString,
