@@ -59,7 +59,7 @@ const urlsForUser = (id, data) => {
 const checkShort  = (id, data) => {
   
   let error = {};
-  
+
   for (let shortURL in data) {
     if (data[shortURL].userID === id) {
       error = {error: null};
@@ -68,10 +68,20 @@ const checkShort  = (id, data) => {
   return error;
 };
 
+const getUserByEmail = function(email, database) {
+  for(let user in database){
+    if(database[user].email === email){ 
+      return database[user].id
+    }
+  } 
+  return undefined
+}
+
 module.exports = {
   generateRandomString,
   uniqueRegister,
   loginHelper,
   urlsForUser,
-  checkShort
+  checkShort,
+  getUserByEmail
 };

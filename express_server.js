@@ -11,7 +11,7 @@ const {
   loginHelper,
   urlsForUser,
   checkShort
-} = require('./functions_server');
+} = require('./helpers');
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
