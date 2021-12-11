@@ -1,4 +1,4 @@
-const PORT = 3000; // default port 8080
+const PORT = 8080; // default port 8080
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
