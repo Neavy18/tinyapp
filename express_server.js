@@ -1,4 +1,4 @@
-const PORT = 8080; // default port 8080
+const PORT = 3000; // default port 8080
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
@@ -75,7 +75,7 @@ app.post("/urls", (req, res) => {
 
   urlDatabase[shortRanURL] = {longURL: req.body.longURL, userID: req.session.user_id};
 
-  res.redirect("/urls");
+  res.redirect(`/urls/${shortRanURL}`); 
 });
 
 //delete URL
@@ -221,13 +221,13 @@ app.get("/urls/:shortURL", (req, res) => {
 //if short URL is assigned to valid longURl, redirects to page
 //if not, returns error message
 app.get("/u/:shortURL", (req, res) => {
-  
-  const longURL = urlDatabase[req.params.shortURL].longURL;
-  
-  if (!longURL[req.params.shortURL]) {
+    
+  if (!urlDatabase[req.params.shortURL]) {
     return res.send("<html><body><h1>Error: The page doesn't exist</h1></body></html>");
   }
   
+  const longURL = urlDatabase[req.params.shortURL].longURL;
+
   res.redirect(longURL);
 });
 
